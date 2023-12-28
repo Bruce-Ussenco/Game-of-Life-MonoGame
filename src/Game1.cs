@@ -13,8 +13,8 @@ public class Game1 : Game {
 
     private Cell[][] cells;
 
-    private int rows = 32;
-    private int cols = 32;
+    public int rows = 32;
+    public int cols = 32;
 
     private int cellSize = 16;
 
@@ -45,6 +45,18 @@ public class Game1 : Game {
     protected override void Update(GameTime gameTime) {
         if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
             Exit();
+
+        for (int j = 0; j < rows; j++) {
+        for (int i = 0; i < cols; i++) {
+            cells[i][j].SetNewState(CountCellAround(i, j));
+        }
+        }
+
+        for (int j = 0; j < rows; j++) {
+        for (int i = 0; i < cols; i++) {
+            cells[i][j].Update();
+        }
+        }
 
         base.Update(gameTime);
     }
@@ -95,5 +107,18 @@ public class Game1 : Game {
         return array;
     }
 
-    
+    private int CountCellAround(int cellI, int cellJ) {
+        int sum = 0;
+  
+        for (int i = -1; i < 2; i++) {
+        for (int j = -1; j < 2; j++) {
+            int col = (cellI + i + cols) % cols;
+            int row = (cellJ + j + rows) % rows;
+            sum += cells[col][row].state ? 1 : 0;
+        }
+        }
+        
+        sum -= cells[cellI][cellJ].state  ? 1 : 0;
+        return sum;
+    }
 }

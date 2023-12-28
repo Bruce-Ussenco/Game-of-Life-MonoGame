@@ -9,7 +9,7 @@ public class Cell {
     int y;
     int size;
 
-    bool state    = false;
+    public bool state = false;
     bool newState = false;
 
     public Cell(int i, int j, int cellSize, bool cellState) {
@@ -25,8 +25,13 @@ public class Cell {
             spriteBatch.Draw(sprite, new Rectangle(x, y, size, size), Color.White);
     }
 
-    public void SetNewState(Cell[][] grid) {
-
+    public void SetNewState(int cellsAround) {
+        if (state == false && cellsAround == 3)
+            newState = true;
+        else if (state == true && (cellsAround < 2 || cellsAround > 3) )
+            newState = false;
+        else
+            newState = state;
     }
 
     public void Update() => state = newState;
