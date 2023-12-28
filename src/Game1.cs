@@ -18,6 +18,8 @@ public class Game1 : Game {
 
     private int cellSize = 16;
 
+    private bool paused = true;
+
     public Game1() {
         _graphics = new GraphicsDeviceManager(this);
 
@@ -45,17 +47,27 @@ public class Game1 : Game {
     protected override void Update(GameTime gameTime) {
         if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
             Exit();
+        
+        //if (Keyboard.GetState().IsKeyUp(Keys.Space))
+        //    paused = !paused;
+        
+        KeyHelper.GetState();
 
-        for (int j = 0; j < rows; j++) {
-        for (int i = 0; i < cols; i++) {
-            cells[i][j].SetNewState(CountCellAround(i, j));
-        }
-        }
+        if (KeyHelper.IsKeyPressed(Keys.Space))
+            paused = !paused;
 
-        for (int j = 0; j < rows; j++) {
-        for (int i = 0; i < cols; i++) {
-            cells[i][j].Update();
-        }
+        if (!paused) {
+            for (int j = 0; j < rows; j++) {
+            for (int i = 0; i < cols; i++) {
+                cells[i][j].SetNewState(CountCellAround(i, j));
+            }
+            }
+
+            for (int j = 0; j < rows; j++) {
+            for (int i = 0; i < cols; i++) {
+                cells[i][j].Update();
+            }
+            }
         }
 
         base.Update(gameTime);
