@@ -20,12 +20,16 @@ public class Cell {
         state = cellState;
     }
 
-    public void Draw(SpriteBatch spriteBatch, Texture2D sprite) {
+    public void Draw(SpriteBatch spriteBatch, Texture2D sprite, Color color) {
         if (state) // if the cell is alive draw a white square
-            spriteBatch.Draw(sprite, new Rectangle(x, y, size, size), Color.White);
+            spriteBatch.Draw(sprite, new Rectangle(x, y, size, size), color);
     }
 
-    public void SetNewState(int cellsAround) {
+    public void SetState(bool setState) => state = setState;
+
+    public bool GetState() => state;
+
+    public void UpdateNewState(int cellsAround) {
         if (state == false && cellsAround == 3)
             newState = true;
         else if (state == true && (cellsAround < 2 || cellsAround > 3) )

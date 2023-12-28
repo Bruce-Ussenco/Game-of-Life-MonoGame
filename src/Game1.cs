@@ -32,7 +32,7 @@ public class Game1 : Game {
     }
 
     protected override void Initialize() {
-        cells = GenerateCells(rows, cols, cellSize, -1);
+        cells = GenerateCells(rows, cols, cellSize, 0);
 
         base.Initialize();
     }
@@ -48,9 +48,6 @@ public class Game1 : Game {
         if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
             Exit();
         
-        //if (Keyboard.GetState().IsKeyUp(Keys.Space))
-        //    paused = !paused;
-        
         KeyHelper.GetState();
 
         if (KeyHelper.IsKeyPressed(Keys.Space))
@@ -59,7 +56,7 @@ public class Game1 : Game {
         if (!paused) {
             for (int j = 0; j < rows; j++) {
             for (int i = 0; i < cols; i++) {
-                cells[i][j].SetNewState(CountCellAround(i, j));
+                cells[i][j].UpdateNewState(CountCellAround(i, j));
             }
             }
 
@@ -70,17 +67,37 @@ public class Game1 : Game {
             }
         }
 
+        CheckMouse();
+
         base.Update(gameTime);
     }
 
-    protected override void Draw(GameTime gameTime) {
-        GraphicsDevice.Clear(Color.Black);
+    private void CheckMouse() {
+        MouseState mouse = Mouse.GetState();
 
+        int mouseI = mouse.X / cellSize;
+        int mouseJ = mouse.Y / cellSize;
+
+        if (mouseI >= 0 && mouseI < cols &&  mouseJ >= 0 && mouseJ < rows) {
+            if (mouse.LeftButton == ButtonState.Pressed)
+                cells[mouseI][mouseJ].SetState(true);
+            if (mouse.RightButton == ButtonState.Pressed)
+                cells[mouseI][mouseJ].SetState(false);
+        }
+    }
+
+    protected override void Draw(GameTime gameTime) {
+        Color bgColor   = paused ? new Color( 30,  30,  40) : Color.Black;
+        Color cellColor = paused ? new Color(255, 255, 225) : Color.White;
+
+        GraphicsDevice.Clear(bgColor);
+
+        
         _spriteBatch.Begin();
 
         for (int j = 0; j < rows; j++) {
         for (int i = 0; i < cols; i++) {
-            cells[i][j].Draw(_spriteBatch, cellTexture);
+            cells[i][j].Draw(_spriteBatch, cellTexture, cellColor);
         }
         }
 
@@ -126,11 +143,11 @@ public class Game1 : Game {
         for (int j = -1; j < 2; j++) {
             int col = (cellI + i + cols) % cols;
             int row = (cellJ + j + rows) % rows;
-            sum += cells[col][row].state ? 1 : 0;
+            sum += cells[col][row].GetState() ? 1 : 0;
         }
         }
         
-        sum -= cells[cellI][cellJ].state  ? 1 : 0;
+        sum -= cells[cellI][cellJ].GetState()  ? 1 : 0;
         return sum;
     }
 }
